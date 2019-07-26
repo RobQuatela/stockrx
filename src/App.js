@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import TitleBar from './common/components/title-bar';
-import * as stocksService from './common/services/stocks-service';
+import * as stocksStore from './common/stores/stocks-store';
+import * as snackbarStore from './common/stores/snackbar-store';
 import StocksProvider from './pages/stocks/stocks-provider';
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom';
 import PortfolioProvider from './pages/portfolio/portfolio-provider';
-import { Drawer, makeStyles } from '@material-ui/core';
+import { Drawer, makeStyles, Snackbar, Icon } from '@material-ui/core';
 import DrawerContent from './common/components/drawer-content';
 
 const drawerWidth = 250;
@@ -34,9 +35,21 @@ const useStyles = makeStyles({
 
 function App() {
   const classes = useStyles();
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+
   useEffect(() => {
-    stocksService.findall();
-  }, [])
+    stocksStore.findall();
+    const subscription = snackbarStore.snackbar$.subscribe(snackbar => {
+      setIsSnackbarOpen(snackbar.isOpen);
+      setSnackbarMessage(snackbar.message);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleCloseSnackbar = () => setIsSnackbarOpen(false);
+
   return (
     <div className={classes.root}>
       <TitleBar appbarstyle={classes.appBar} />
@@ -59,6 +72,21 @@ function App() {
           </div>
         </div>
       </Router>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        open={isSnackbarOpen}
+        autoHideDuration={500}
+        message={
+          <div style={{display: 'flex', alignItems: 'center', color: 'lightgreen'}}>
+            <Icon>thumb_up</Icon>
+            <span style={{marginLeft: 10}}>{snackbarMessage}</span>
+          </div>
+        }
+        onClose={handleCloseSnackbar}
+      />
     </div>
   );
 }

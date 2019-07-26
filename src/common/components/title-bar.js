@@ -1,10 +1,11 @@
 import React from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Icon, makeStyles } from '@material-ui/core';
-import * as stocksService from '../services/stocks-service';
+import * as stocksStore from '../stores/stocks-store';
 
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
+    color: '#ace5ff',
   },
   titleBarColorPrimary: {
     backgroundColor: '#384047',
@@ -27,13 +28,13 @@ const TitleBar = (props) => {
   const classes = useStyles();
 
   const handleRefresh = async () => {
-    await stocksService.findall();
+    await stocksStore.findall();
   }
 
   return (
     <AppBar position='static' classes={{ root: classes.root, colorPrimary: classes.titleBarColorPrimary }} className={props.appbarstyle}>
       <Toolbar>
-        <Typography variant='h5' className={classes.root}>StockTix</Typography>
+        <Typography variant='h5' color='secondary' className={classes.root}>StockRx</Typography>
         <div className={classes.menuButton}>
           <IconButton onClick={handleRefresh}>
             <Icon color='primary' classes={{ colorPrimary: classes.refreshColorPrimary }}>refresh</Icon>

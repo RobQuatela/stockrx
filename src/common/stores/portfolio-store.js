@@ -1,4 +1,5 @@
 import { BehaviorSubject } from "rxjs";
+import * as snackBarStore from './snackbar-store';
 
 /*
   STATE OBJECT
@@ -42,7 +43,10 @@ const buyStockEffect = (stock, portfolioState) => {
   }
 
   wallet = wallet - stock.price;
-  
+
+  // send off snackbar action
+  snackBarStore.actions.show(`Purchased 1 share of ${stock.symbol} to your portfolio`);
+
   // return new portfolio state object
   return {
     ...portfolioState,
@@ -70,6 +74,9 @@ const sellStockEffect = (stock, portfolioState) => {
 
   wallet = wallet + stock.price;
 
+  // send off snackbar action
+  snackBarStore.actions.show(`Sold 1 share of ${stock.symbol} to your portfolio`);
+
   // give the behavior subject a new state
   return {
     ...portfolioState,
@@ -81,19 +88,20 @@ const sellStockEffect = (stock, portfolioState) => {
 /*
   ACTIONS
 */
-export const buyStock = (stock) => {
-  // effect
-  const newPortfolioState = buyStockEffect(stock, portfolioSubject.value);
-  // push new state
-  portfolioSubject.next(newPortfolioState);
-}
-
-export const sellStock = (stock) => {
-  // effect
-  const newPortfolioState = sellStockEffect(stock, portfolioSubject.value);
-  // push new state
-  portfolioSubject.next(newPortfolioState);
-}
+export const actions = {
+  buyStock: (stock) => {
+    // effect
+    const newPortfolioState = buyStockEffect(stock, portfolioSubject.value);
+    // push new state
+    portfolioSubject.next(newPortfolioState);
+  },
+  sellStock: (stock) => {
+    // effect
+    const newPortfolioState = sellStockEffect(stock, portfolioSubject.value);
+    // push new state
+    portfolioSubject.next(newPortfolioState);
+  },
+};
 
 /*
 GETTERS

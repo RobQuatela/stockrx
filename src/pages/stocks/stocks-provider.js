@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import StockList from './stock-list';
-import * as stocksService from '../../common/services/stocks-service';
-import * as portfolioService from '../../common/services/portfolio-service';
+import * as stocksStore from '../../common/stores/stocks-store';
+import * as portfolioStore from '../../common/stores/portfolio-store';
 import './stocks-provider.css';
+import StockCharts from './stock-charts';
 
 const StocksProvider = () => {
   const [state, setState] = useState({
@@ -12,7 +13,7 @@ const StocksProvider = () => {
   });
 
   useEffect(() => {
-    stocksService.stocksStateWithSharesOwned$.subscribe(stockServiceState => {
+    const subscription = stocksStore.stocksStateWithSharesOwned$.subscribe(stockServiceState => {
       setState({
         loading: stockServiceState.loading,
         stocks: stockServiceState.stocks,
@@ -20,43 +21,24 @@ const StocksProvider = () => {
       });
     });
 
-    //return subscription.unsubscribe();
+    return () => subscription.unsubscribe();
   }, []);
 
-  // const handleRefresh = async () => {
-  //   await stocksService.findall();
-  // }
-
-  // const handleSearch = (word) => {
-  //   if (word === '') {
-  //     setState({
-  //       ...state,
-  //       filteredStocks: state.stocks,
-  //     });
-  //   } else {
-  //     setState({
-  //       ...state,
-  //       filteredStocks: state.stocks.filter(x => x.symbol.toLowerCase().indexOf(word.toLowerCase()) > -1),
-  //     });
-  //   }
-  // }
-
   const handleBuyStock = (stock) => {
-    portfolioService.buyStock(stock);
+    portfolioStore.actions.buyStock(stock);
   }
 
   const handleSellStock = (stock) => {
-    portfolioService.sellStock(stock);
+    portfolioStore.actions.sellStock(stock);
   }
 
   return (
     <div className='stocks-provider'>
-      {/* <StocksMenu 
-        handleRefresh={handleRefresh} 
-        handleSearch={handleSearch}
-      /> */}
+      <StockCharts
+        data={{ datasets: [{ data: [10, 20, 30] }], labels: ['Red', 'Yellow', 'Blue'] }}
+      />
       <h2>Stocks</h2>
-      <StockList 
+      <StockList
         loading={state.loading}
         stocks={state.filteredStocks}
         handleBuyStock={handleBuyStock}

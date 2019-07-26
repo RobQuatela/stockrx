@@ -1,6 +1,6 @@
 import { BehaviorSubject } from "rxjs";
 import { map, combineLatest } from 'rxjs/operators';
-import * as portfolioService from './portfolio-service';
+import * as portfolioStore from './portfolio-store';
 
 const stockState = {
   loading: true,
@@ -14,7 +14,7 @@ export const stockState$ = stocksSubject.asObservable();
 export const stocksStateWithSharesOwned$ =
   stockState$
     .pipe(
-      combineLatest(portfolioService.portfolio$),
+      combineLatest(portfolioStore.portfolio$),
       map(([stocksState, portfolioState]) => {
         return {
           loading: stocksState.loading,

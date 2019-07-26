@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles, Divider, List, ListItem, ListItemIcon, Icon, ListItemText } from '@material-ui/core';
-import * as portFolioServices from '../services/portfolio-service';
+import * as portFolioServices from '../stores/portfolio-store';
 import { NavLink } from 'react-router-dom';
 
 const useStyles = makeStyles({
@@ -10,11 +10,12 @@ const useStyles = makeStyles({
     height: '100%',
   },
   avatar: {
-    height: 100,
-    width: 100,
+    height: 150,
+    width: 150,
     borderRadius: '50%',
     backgroundImage: 'url(https://api.adorable.io/avatars/285/abott@adorable.png)',
     backgroundSize: 'cover',
+    boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 2px 1px -1px rgba(0,0,0,0.12)',
     alignSelf: 'center',
     justifySelf: 'center',
   },
@@ -38,11 +39,11 @@ const useStyles = makeStyles({
     color: '#d5d6d7',
     '&:hover': {
       textDecoration: 'none',
-      color: '#04a9f4',
+      color: '#ace5ff',
     }
   },
   linkActive: {
-    color: '#04a9f4',
+    color: '#ace5ff',
   },
   iconPrimaryColor: {
     color: '#d5d6d7',
