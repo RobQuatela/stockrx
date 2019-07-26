@@ -1,21 +1,44 @@
 import React from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Icon, makeStyles } from '@material-ui/core';
+import * as stocksService from '../services/stocks-service';
 
-const useStyles = makeStyles({
-  iconColor: {
-    color: 'white',
-  }
-})
+const useStyles = makeStyles(theme => ({
+  root: {
+    flexGrow: 1,
+  },
+  titleBarColorPrimary: {
+    backgroundColor: '#384047',
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+    display: 'flex',
+    alignItems: 'center',
+  },
+  money: {
+    color: '#3cff3c',
+    marginRight: theme.spacing(3),
+  },
+  refreshColorPrimary: {
+    color: '#04a9f4',
+  },
+}));
 
-const TitleBar = () => {
+const TitleBar = (props) => {
   const classes = useStyles();
+
+  const handleRefresh = async () => {
+    await stocksService.findall();
+  }
+
   return (
-    <AppBar color='primary' position='static'>
+    <AppBar position='static' classes={{ root: classes.root, colorPrimary: classes.titleBarColorPrimary }} className={props.appbarstyle}>
       <Toolbar>
-        <IconButton edge='start'>
-          <Icon classes={{ colorPrimary: classes.iconColor }}>menu</Icon>
-        </IconButton>
-        <Typography variant='h5'>StockTix</Typography>
+        <Typography variant='h5' className={classes.root}>StockTix</Typography>
+        <div className={classes.menuButton}>
+          <IconButton onClick={handleRefresh}>
+            <Icon color='primary' classes={{ colorPrimary: classes.refreshColorPrimary }}>refresh</Icon>
+          </IconButton>
+        </div>
       </Toolbar>
     </AppBar>
   );

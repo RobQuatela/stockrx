@@ -1,0 +1,12 @@
+.stock-list {
+  height: 400px;
+  overflow-y: auto;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.stock-list-loading {
+  align-items: center;
+  justify-content: center;
+}
