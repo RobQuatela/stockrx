@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import './App.css';
 import TitleBar from './common/components/title-bar';
 import * as stocksStore from './common/stores/stocks-store';
 import * as snackbarStore from './common/stores/snackbar-store';
@@ -12,9 +11,6 @@ import DrawerContent from './common/components/drawer-content';
 const drawerWidth = 250;
 
 const useStyles = makeStyles({
-  root: {
-    //display: 'flex',
-  },
   appBar: {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: drawerWidth,
@@ -39,7 +35,7 @@ function App() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
   useEffect(() => {
-    stocksStore.findall();
+    stocksStore.actions.refresh();
     const subscription = snackbarStore.snackbar$.subscribe(snackbar => {
       setIsSnackbarOpen(snackbar.isOpen);
       setSnackbarMessage(snackbar.message);
@@ -48,10 +44,10 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleCloseSnackbar = () => setIsSnackbarOpen(false);
+  const handleCloseSnackbar = () => snackbarStore.actions.hide();
 
   return (
-    <div className={classes.root}>
+    <div>
       <TitleBar appbarstyle={classes.appBar} />
       <Router>
         <div>

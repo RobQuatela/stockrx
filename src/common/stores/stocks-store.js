@@ -2,15 +2,54 @@ import { BehaviorSubject } from "rxjs";
 import { map, combineLatest } from 'rxjs/operators';
 import * as portfolioStore from './portfolio-store';
 
-const stockState = {
+const initialstate = {
   loading: true,
   stocks: [],
 };
 
-const stocksSubject = new BehaviorSubject(stockState);
+const stocksSubject = new BehaviorSubject(initialstate);
 
+/*
+  EFFECTS
+*/
+const effects = {
+  findAll: async () => {
+    const result = await fetch('https://financialmodelingprep.com/api/v3/company/stock/list').then(res => res.json());
+
+    // launches new action for a successful api call
+    actions.refreshSuccess(result.symbolsList.slice(0, 300));
+  }
+}
+
+/*
+  ACTIONS
+*/
+export const actions = {
+  refresh: async () => {
+    // reduce new state to reflect loading
+    stocksSubject.next({
+      ...stocksSubject.value,
+      loading: true,
+    });
+    // effect
+    await effects.findAll();
+  },
+  refreshSuccess: (payload) => {
+    stocksSubject.next({
+      ...stocksSubject.value,
+      loading: false,
+      stocks: payload,
+    });
+  },
+};
+
+/*
+  GETTERS
+*/
 export const stockState$ = stocksSubject.asObservable();
 
+// combine stock state data with portfolio data using combineLatest operator to
+// return a new observable containing stock state modified by portfolio data
 export const stocksStateWithSharesOwned$ =
   stockState$
     .pipe(
@@ -34,16 +73,21 @@ export const stocksStateWithSharesOwned$ =
       }),
     );
 
-export const findall = async () => {
-  stocksSubject.next({
-    ...stocksSubject.value,
-    loading: true,
-  });
+// return new observable containing the top 5 performing stocks based upon price per share
+export const bestPerformingStocks$ = stockState$
+  .pipe(
+    map(state => {
+      const stocks = [...state.stocks];
+      const orderedStocks = stocks.sort((a, b) => {
+        if (a.price < b.price) {
+          return 1;
+        }
+        if (a.price > b.price) {
+          return -1;
+        }
+        return 0;
+      });
 
-  const result = await fetch('https://financialmodelingprep.com/api/v3/stock/real-time-price').then(res => res.json());
-
-  stocksSubject.next({
-    loading: false,
-    stocks: result.stockList.slice(0, 200),
-  });
-};
+      return orderedStocks.slice(0, 5);
+    }),
+  );

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles, Divider, List, ListItem, ListItemIcon, Icon, ListItemText } from '@material-ui/core';
 import * as portFolioServices from '../stores/portfolio-store';
 import { NavLink } from 'react-router-dom';
+import * as moment from 'moment';
+import * as numeral from 'numeral';
 
 const useStyles = makeStyles({
   drawerContent: {
@@ -21,6 +23,19 @@ const useStyles = makeStyles({
   },
   profile: {
     backgroundColor: '#384047',
+    display: 'grid',
+    gridTemplateColumns: '40% auto',
+    gridTemplateRows: '25% 25% 25% auto',
+    '& small, p': {
+      alignSelf: 'center',
+      margin: 0,
+    },
+    '& small': {
+      justifySelf: 'end'
+    },
+    '& p': {
+      marginLeft: 10,
+    },
   },
   walletStats: {
     display: 'flex',
@@ -31,8 +46,6 @@ const useStyles = makeStyles({
       marginTop: 5,
       marginRight: 10,
     }
-  },
-  navigation: {
   },
   link: {
     textDecoration: 'none',
@@ -48,11 +61,18 @@ const useStyles = makeStyles({
   iconPrimaryColor: {
     color: '#d5d6d7',
   },
-})
+  '@media (max-height: 800px)': {
+    avatar: {
+      height: 100,
+      width: 100,
+    },
+  },
+});
 const DrawerContent = () => {
   const [state, setState] = useState({
     wallet: 0,
     name: '',
+    stocks: [],
     createdAt: new Date(),
   });
 
@@ -64,9 +84,13 @@ const DrawerContent = () => {
         wallet: portfolio.wallet,
         name: portfolio.name,
         createdAt: portfolio.createdAt,
+        stocks: portfolio.stocks,
       });
     });
   }, []);
+
+  const formatMoney = (value) => numeral(value).format('(0,0.00');
+  const getStocksTotal = (value) => state.stocks.length > 0 ? value.map(x => x.price * x.shares).reduce((a, b) => a + b) : 0;
 
   return (
     <div className={classes.drawerContent}>
@@ -74,29 +98,24 @@ const DrawerContent = () => {
       </div>
 
       <div className={classes.profile}>
-        <Divider />
-        <div className={classes.walletStats}>
-          <small>Cash on Hand: </small>
-          <p style={{ color: '#3cff3c' }}>${state.wallet.toFixed(2)}</p>
-        </div>
-        <div className={classes.walletStats}>
-          <small>Name: </small>
-          <p>{state.name}</p>
-        </div>
-        <div className={classes.walletStats}>
-          <small>Created: </small>
-          <p>{state.createdAt.toISOString()}</p>
-        </div>
+        <small>Name:</small>
+        <p>{state.name}</p>
+        <small>Cash on Hand:</small>
+        <p style={{ color: '#3cff3c' }}>${formatMoney(state.wallet)}</p>
+        <small>Portfolio:</small>
+        <p style={{ color: '#3cff3c' }}>${formatMoney(getStocksTotal(state.stocks))}</p>
+        <small>Created: </small>
+        <p>{moment(state.createdAt).format('M/D/Y')}</p>
       </div>
       <div className={classes.navigation}>
         <Divider />
         <List>
           <ListItem>
             <ListItemIcon>
-              <Icon color='primary' classes={{colorPrimary: classes.iconPrimaryColor}}>poll</Icon>
+              <Icon color='primary' classes={{ colorPrimary: classes.iconPrimaryColor }}>poll</Icon>
             </ListItemIcon>
             <ListItemText>
-                <NavLink to='/stocks' className={classes.link} activeClassName={classes.linkActive}>Stock Exchange</NavLink>
+              <NavLink to='/stocks' className={classes.link} activeClassName={classes.linkActive}>Stock Exchange</NavLink>
             </ListItemText>
           </ListItem>
           <ListItem>
@@ -104,7 +123,7 @@ const DrawerContent = () => {
               <Icon color='primary' classes={{ colorPrimary: classes.iconPrimaryColor }}>account_circle</Icon>
             </ListItemIcon>
             <ListItemText>
-                <NavLink to='/portfolio' className={classes.link} activeClassName={classes.linkActive}>My Portfolio</NavLink>
+              <NavLink to='/portfolio' className={classes.link} activeClassName={classes.linkActive}>My Portfolio</NavLink>
             </ListItemText>
           </ListItem>
         </List>

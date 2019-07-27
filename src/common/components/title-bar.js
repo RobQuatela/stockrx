@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppBar, Toolbar, IconButton, Typography, Icon, makeStyles } from '@material-ui/core';
+import { AppBar, Toolbar, IconButton, Typography, Icon, makeStyles, Badge } from '@material-ui/core';
 import * as stocksStore from '../stores/stocks-store';
 
 const useStyles = makeStyles(theme => ({
@@ -19,16 +19,19 @@ const useStyles = makeStyles(theme => ({
     color: '#3cff3c',
     marginRight: theme.spacing(3),
   },
-  refreshColorPrimary: {
-    color: '#04a9f4',
+  iconColorPrimary: {
+    color: '#ace5ff',
   },
+  iconColorSecondary: {
+    color: '#73818e',
+  }
 }));
 
 const TitleBar = (props) => {
   const classes = useStyles();
 
   const handleRefresh = async () => {
-    await stocksStore.findall();
+    await stocksStore.actions.refresh();
   }
 
   return (
@@ -37,7 +40,12 @@ const TitleBar = (props) => {
         <Typography variant='h5' color='secondary' className={classes.root}>StockRx</Typography>
         <div className={classes.menuButton}>
           <IconButton onClick={handleRefresh}>
-            <Icon color='primary' classes={{ colorPrimary: classes.refreshColorPrimary }}>refresh</Icon>
+            <Icon color='primary' classes={{ colorPrimary: classes.iconColorPrimary }}>refresh</Icon>
+          </IconButton>
+          <IconButton>
+            <Badge badgeContent={7} max={5} color='secondary'>
+              <Icon color='secondary' classes={{ colorSecondary: classes.iconColorSecondary }}>notifications</Icon>
+            </Badge>
           </IconButton>
         </div>
       </Toolbar>

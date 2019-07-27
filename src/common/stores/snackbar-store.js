@@ -3,11 +3,11 @@ import { BehaviorSubject } from "rxjs";
 /*
   STATE OBJECTS
 */
-
-const snackbarSubject = new BehaviorSubject({
+const initialState = {
   isOpen: false,
   message: '',
-});
+}
+const snackbarSubject = new BehaviorSubject(initialState);
 
 /*
   ACTIONS
@@ -19,6 +19,12 @@ export const actions = {
       message,
     });
   },
+  hide: () => {
+    snackbarSubject.next({
+      isOpen: false,
+      message: '',
+    });
+  }
 };
 
 /*

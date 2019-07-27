@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Table, TableHead, TableRow, TableCell, TableBody, makeStyles, TablePagination, TableFooter } from '@material-ui/core';
+import { Table, TableHead, TableRow, TableCell, TableBody, makeStyles, TablePagination, TableFooter, Paper } from '@material-ui/core';
+import * as numeral from 'numeral';
 
 const useStyles = makeStyles({
   root: {
     margin: 30,
     backgroundColor: '#384047',
-    boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 2px 1px -1px rgba(0,0,0,0.12)',
-    borderRadius: 4,
   },
   tdStyles: {
     color: '#fff',
@@ -26,14 +25,17 @@ const PortfolioStockTable = (props) => {
     setPage(0);
   }
 
+  const formatMoney = (value) => `$${numeral(value).format('(0,0.00)')}`;
+
   return (
-    <div className={classes.root}>
+    <Paper elevation={2} classes={{ root: classes.root }}>
       <Table>
         <TableHead>
           <TableRow>
             <TableCell className={classes.tdStyles}>Name</TableCell>
             <TableCell className={classes.tdStyles}>Price</TableCell>
             <TableCell className={classes.tdStyles}>Shares Owned</TableCell>
+            <TableCell className={classes.tdStyles}>Valuation</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -42,8 +44,9 @@ const PortfolioStockTable = (props) => {
               return (
                 <TableRow key={stock.symbol}>
                   <TableCell className={classes.tdStyles}>{stock.symbol}</TableCell>
-                  <TableCell className={classes.tdStyles}>${stock.price}</TableCell>
+                  <TableCell className={classes.tdStyles}>{formatMoney(stock.price)}</TableCell>
                   <TableCell className={classes.tdStyles}>{stock.shares}</TableCell>
+                  <TableCell className={classes.tdStyles}>{formatMoney(stock.price * stock.shares)}</TableCell>
                 </TableRow>
               )
             })
@@ -62,7 +65,7 @@ const PortfolioStockTable = (props) => {
           </TableRow>
         </TableFooter>
       </Table>
-    </div>
+    </Paper>
   );
 };
 

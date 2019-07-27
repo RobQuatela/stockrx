@@ -35,7 +35,7 @@ const PortfolioProvider = () => {
 
   return (
     <div className={classes.root}>
-      <h2>My Portfolio</h2>
+      <h4>My Portfolio</h4>
       <PortfolioDetail 
         name={state.name} 
         stocks={state.stocks}

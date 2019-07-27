@@ -1,7 +1,7 @@
 import React from 'react';
-import './stock-list-item.css';
-import { Icon, IconButton } from '@material-ui/core';
+import { Icon, IconButton, Button, CircularProgress } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
+import * as numeral from 'numeral';
 
 const useStyles = makeStyles({
   colorPrimary: {
@@ -13,6 +13,24 @@ const useStyles = makeStyles({
   centered: {
     alignSelf: 'center',
   },
+  stockListItem: {
+    display: 'grid',
+    gridTemplateColumns: '15% auto 30% 10%',
+    backgroundColor: '#384047',
+    boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 2px 1px -1px rgba(0,0,0,0.12)',
+    margin: 10,
+    padding: '10px 16px',
+    borderRadius: 4,
+    width: '40%',
+    '& h1, h2, h3, h4, h5, h6': {
+      margin: 0,
+      alignSelf: 'center',
+    },
+    '& h4': {
+      fontSize: '2rem',
+      color: '#3cff3c',
+    },
+  }
 });
 
 const StockListItem = (props) => {
@@ -33,11 +51,15 @@ const StockListItem = (props) => {
     }
   }
 
+  const formatMoney = (value) => `$${numeral(value).format('(0,0.00)')}`;
+
   return (
-    <div className='stock-list-item'>
-      <h5>{props.stock.symbol}</h5>
+    <div className={classes.stockListItem}>
+      <Button onClick={() => props.handleSelectStock(props.stock)}>
+        <h5>{props.stock.symbol}</h5>
+      </Button>
       <div className={classes.centered}>
-        <h4>${props.stock.price}</h4>
+        <h4>{formatMoney(props.stock.price)}</h4>
       </div>
       <div className={classes.centered}>
         <IconButton
@@ -49,7 +71,9 @@ const StockListItem = (props) => {
         </IconButton>
         {showSellStockButton()}
       </div>
-      <h3>{props.stock.sharesOwned}</h3>
+      {
+        !props.loading ? <h3>{props.stock.sharesOwned}</h3> : <CircularProgress />
+      }
     </div>
   )
 };
