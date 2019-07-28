@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import StockList from './stock-list';
-import * as stocksStore from '../../common/stores/stocks-store';
+import * as availableStocksStore from '../../common/stores/available-stocks-store';
 import * as portfolioStore from '../../common/stores/portfolio-store';
 import * as selectedStocksStore from '../../common/stores/selected-stocks-store';
 import StockCharts from './stock-charts';
@@ -17,21 +17,13 @@ const useStyles = makeStyles({
   },
   tabStyles: {
     color: 'white',
-  }
+  },
+  tabPanel: {
+    margin: 20,
+  },
 });
 
-const TabPanel = (props) => {
-  return (
-    <Typography
-      component='div'
-      role='tabpanel'
-      hidden={props.value !== props.index}
-      id={props.index}
-    >
-      {props.children}
-    </Typography>
-  )
-}
+
 
 const StocksProvider = () => {
   const classes = useStyles();
@@ -52,7 +44,7 @@ const StocksProvider = () => {
     const subscriptions = [];
 
     // subscribe to stocks with shares owned in order to fill up the stock list
-    subscriptions.push(stocksStore.stocksStateWithSharesOwned$.subscribe(stockStoreState => {
+    subscriptions.push(availableStocksStore.availableStocksStateWithSharesOwned$.subscribe(stockStoreState => {
       setAvilableStocksState({
         loading: stockStoreState.loading,
         stocks: stockStoreState.stocks,
@@ -60,7 +52,7 @@ const StocksProvider = () => {
     }));
 
     // subscribe to best performing stocks observable to push down to horizontal bar graph
-    subscriptions.push(stocksStore.bestPerformingStocks$.subscribe(stocks => {
+    subscriptions.push(availableStocksStore.bestPerformingStocks$.subscribe(stocks => {
       setTopFiveStockPicks(stocks);
     }));
 
@@ -81,24 +73,38 @@ const StocksProvider = () => {
     return () => subscriptions.forEach(subscription => subscription.unsubscribe());
   }, []);
 
-  const handleBuyStock = (stock) => {
+  const buyStock = (stock) => {
     portfolioStore.actions.buyStock(stock);
   }
 
-  const handleSellStock = (stock) => {
+  const sellStock = (stock) => {
     portfolioStore.actions.sellStock(stock);
   }
 
-  const handleSelectStock = (stock) => {
+  const selectStock = (stock) => {
     selectedStocksStore.actions.select(stock);
   }
 
-  const handleRemoveSelectedStock = (stock) => {
+  const removeSelectedStock = (stock) => {
     selectedStocksStore.actions.remove(stock);
     setTab(0);
   }
 
   const handleTabChange = (event, newValue) => setTab(newValue);
+
+  const TabPanel = (props) => {
+    return (
+      <Typography
+        component='div'
+        role='tabpanel'
+        hidden={props.value !== props.index}
+        className={classes.tabPanel}
+        id={props.index}
+      >
+        {props.children}
+      </Typography>
+    )
+  }
 
   return (
     <div className={classes.stocksProvider}>
@@ -120,15 +126,15 @@ const StocksProvider = () => {
           loading={availableStocksState.loading}
           selectedStockLoading={selectedStocksState.loading}
           stocks={availableStocksState.stocks}
-          handleBuyStock={handleBuyStock}
-          handleSellStock={handleSellStock}
-          handleSelectStock={handleSelectStock}
+          handleBuyStock={buyStock}
+          handleSellStock={sellStock}
+          handleSelectStock={selectStock}
         />
       </TabPanel>
       {
         selectedStocksState.stocks.map((value, index) => (
           <TabPanel value={tab} index={index + 1} key={value.stockInfo.symbol}>
-            <SelectedStock stock={value} onremovestock={handleRemoveSelectedStock} />
+            <SelectedStock stock={value} onremovestock={removeSelectedStock} />
           </TabPanel>
         ))
       }

@@ -1,6 +1,8 @@
 import { BehaviorSubject } from "rxjs";
 import { map, combineLatest } from 'rxjs/operators';
 import * as portfolioStore from './portfolio-store';
+import * as activitiesStore from './activities-store';
+import * as moment from 'moment';
 
 const initialstate = {
   loading: true,
@@ -18,6 +20,13 @@ const effects = {
 
     // launches new action for a successful api call
     actions.refreshSuccess(result.symbolsList.slice(0, 300));
+
+    // send off activities action
+    activitiesStore.actions.add({
+      id: new Date(),
+      message: `Refreshed available stocks`,
+      createdAt: moment().format('H:MM:SS'),
+    });
   }
 }
 
@@ -46,12 +55,12 @@ export const actions = {
 /*
   GETTERS
 */
-export const stockState$ = stocksSubject.asObservable();
+export const availableStocksState$ = stocksSubject.asObservable();
 
 // combine stock state data with portfolio data using combineLatest operator to
 // return a new observable containing stock state modified by portfolio data
-export const stocksStateWithSharesOwned$ =
-  stockState$
+export const availableStocksStateWithSharesOwned$ =
+  availableStocksState$
     .pipe(
       combineLatest(portfolioStore.portfolio$),
       map(([stocksState, portfolioState]) => {
@@ -74,7 +83,7 @@ export const stocksStateWithSharesOwned$ =
     );
 
 // return new observable containing the top 5 performing stocks based upon price per share
-export const bestPerformingStocks$ = stockState$
+export const bestPerformingStocks$ = availableStocksState$
   .pipe(
     map(state => {
       const stocks = [...state.stocks];

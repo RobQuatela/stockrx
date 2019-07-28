@@ -16,12 +16,12 @@ const useStyles = makeStyles({
   stockListItem: {
     display: 'grid',
     gridTemplateColumns: '15% auto 30% 10%',
-    backgroundColor: '#384047',
+    backgroundColor: '#1e272e',
     boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 2px 1px -1px rgba(0,0,0,0.12)',
     margin: 10,
     padding: '10px 16px',
     borderRadius: 4,
-    width: '40%',
+    width: '42%',
     '& h1, h2, h3, h4, h5, h6': {
       margin: 0,
       alignSelf: 'center',
@@ -45,7 +45,7 @@ const StockListItem = (props) => {
           classes={{ colorPrimary: classes.colorSecondary }}
           onClick={() => props.handleSellStock(props.stock)}
         >
-          <Icon>thumb_down</Icon>
+          <Icon>remove_circle_outline</Icon>
         </IconButton>
       );
     }
@@ -67,7 +67,7 @@ const StockListItem = (props) => {
           classes={{ colorPrimary: classes.colorPrimary }}
           onClick={() => props.handleBuyStock(props.stock)}
         >
-          <Icon>thumb_up</Icon>
+          <Icon>add_circle_outline</Icon>
         </IconButton>
         {showSellStockButton()}
       </div>

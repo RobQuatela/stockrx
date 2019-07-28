@@ -30,7 +30,7 @@ const StockCharts = (props) => {
               labels: props.myStocksData.labels,
             }
           }
-          height={200}
+          height={250}
           width={200}
           options={
             {
@@ -57,7 +57,7 @@ const StockCharts = (props) => {
               labels: props.topFiveData.labels,
             }
           }
-          height={200}
+          height={250}
           width={200}
           options={
             {

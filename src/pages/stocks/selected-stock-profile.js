@@ -25,7 +25,7 @@ const useStyles = makeStyles({
 const SelectedStockProfile = (props) => {
   const classes = useStyles();
 
-  const formatMoney = (value) => `$${numeral(value).format('(0,0)')}`;
+  const formatMoney = (value) => `$${numeral(value).format('(0,0.00)')}`;
 
   return (
     <div className={classes.profile}>

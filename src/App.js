@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import TitleBar from './common/components/title-bar';
-import * as stocksStore from './common/stores/stocks-store';
+import * as stocksStore from './common/stores/available-stocks-store';
 import * as snackbarStore from './common/stores/snackbar-store';
 import StocksProvider from './pages/stocks/stocks-provider';
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom';
 import PortfolioProvider from './pages/portfolio/portfolio-provider';
 import { Drawer, makeStyles, Snackbar, Icon } from '@material-ui/core';
 import DrawerContent from './common/components/drawer-content';
+import ActivityProvider from './pages/activity/activity-provider';
 
 const drawerWidth = 250;
 
@@ -63,6 +64,7 @@ function App() {
             <Switch>
               <Route path='/stocks' component={StocksProvider} />
               <Route path='/portfolio' component={PortfolioProvider} />
+              <Route path='/activity' component={ActivityProvider} />
               <Redirect from='*' to='/stocks' />
             </Switch>
           </div>

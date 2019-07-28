@@ -1,4 +1,6 @@
 import { BehaviorSubject } from "rxjs";
+import * as activitiesStore from './activities-store';
+import * as moment from 'moment';
 
 const initialState = {
   stocks: [],
@@ -17,6 +19,32 @@ const effects = {
     const result = await fetch(`https://financialmodelingprep.com/api/v3/financials/income-statement/${stock.symbol}`).then(res => res.json());
     return result.financials;
   },
+  findDetail: async (stock) => {
+    const profile = await effects.findProfile(stock);
+    const financials = await effects.findFinancials(stock);
+    const selectedStock = {
+      stockInfo: stock,
+      profile,
+      financials,
+    };
+
+    // send off activities action
+    activitiesStore.actions.add({
+      id: new Date(),
+      message: `Selected ${stock.symbol} to view`,
+      createdAt: moment().format('H:MM:SS'),
+    });
+
+    actions.selectSuccess(selectedStock);
+  },
+  removeStock: (stock) => {
+    // send off activities action
+    activitiesStore.actions.add({
+      id: new Date(),
+      message: `Closed ${stock.stockInfo.symbol} detail view`,
+      createdAt: moment().format('H:MM:SS'),
+    });
+  },
 };
 
 export const actions = {
@@ -29,26 +57,26 @@ export const actions = {
         loading: true,
       });
 
-      const profile = await effects.findProfile(stock);
-      const financials = await effects.findFinancials(stock);
-      const selectedStock = {
-        stockInfo: stock,
-        profile,
-        financials,
-      };
-
-      selectedStocksSubject.next({
-        ...selectedStocksSubject.value,
-        stocks: [...selectedStocksSubject.value.stocks, selectedStock],
-        loading: false,
-      });
+      await effects.findDetail(stock);
     }
   },
+  selectSuccess: (stock) => {
+    // mutate state to show new available stock state
+    selectedStocksSubject.next({
+      ...selectedStocksSubject.value,
+      stocks: [...selectedStocksSubject.value.stocks, stock],
+      loading: false,
+    });
+  },
   remove: (stock) => {
+    // remove stock from available stock state
     selectedStocksSubject.next({
       ...selectedStocksSubject.value,
       stocks: selectedStocksSubject.value.stocks.filter(x => x.stockInfo.symbol !== stock.stockInfo.symbol),
     });
+
+    // side effects for remove....launch activity action
+    effects.removeStock(stock);
   },
 };
 

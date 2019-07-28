@@ -126,6 +126,14 @@ const DrawerContent = () => {
               <NavLink to='/portfolio' className={classes.link} activeClassName={classes.linkActive}>My Portfolio</NavLink>
             </ListItemText>
           </ListItem>
+          <ListItem>
+            <ListItemIcon>
+              <Icon color='primary' classes={{ colorPrimary: classes.iconPrimaryColor }}>history</Icon>
+            </ListItemIcon>
+            <ListItemText>
+              <NavLink to='/activity' className={classes.link} activeClassName={classes.linkActive}>Activity</NavLink>
+            </ListItemText>
+          </ListItem>
         </List>
       </div>
     </div>

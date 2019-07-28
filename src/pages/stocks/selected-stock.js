@@ -5,7 +5,6 @@ import SelectedStockProfile from './selected-stock-profile';
 
 const useStyles = makeStyles({
   root: {
-    margin: 20,
   },
   companyDetail: {
     color: '#000',

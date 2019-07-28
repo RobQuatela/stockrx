@@ -4,13 +4,15 @@ import * as numeral from 'numeral';
 
 const SelectedStockFinancials = (props) => {
 
-  const formatValue = (value) => `$${numeral((value / 1000000)).format('(0,0)')}`;
+  const formatRoundedMoneyInMillions = (value) => `$${numeral((value / 1000000)).format('(0,0)')}`;
+  const formatMoney = (value) => `$${numeral(value).format('0,0.00')}`;
+  const formatPercent = (value) => `${numeral(value * 100).format('0,0.0')}%`;
 
   return (
     <Table>
       <TableHead>
         <TableRow>
-          <TableCell align='right'>Metric (in millions)</TableCell>
+          <TableCell align='right'>Metric</TableCell>
           <TableCell align='right'>{props.financials[0].date}</TableCell>
           <TableCell align='right'>{props.financials[1].date}</TableCell>
           <TableCell align='right'>{props.financials[2].date}</TableCell>
@@ -18,52 +20,40 @@ const SelectedStockFinancials = (props) => {
       </TableHead>
       <TableBody>
         <TableRow>
-          <TableCell align='right'>Revenue</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[0].Revenue)}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[1].Revenue)}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[2].Revenue)}</TableCell>
+          <TableCell align='right'>Revenue (in millions)</TableCell>
+          <TableCell align='right'>{formatRoundedMoneyInMillions(props.financials[0].Revenue)}</TableCell>
+          <TableCell align='right'>{formatRoundedMoneyInMillions(props.financials[1].Revenue)}</TableCell>
+          <TableCell align='right'>{formatRoundedMoneyInMillions(props.financials[2].Revenue)}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align='right'>Cost of Revenue</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[0]['Cost of Revenue'])}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[1]['Cost of Revenue'])}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[2]['Cost of Revenue'])}</TableCell>
+          <TableCell align='right'>Revenue Growth</TableCell>
+          <TableCell align='right'>{formatPercent(props.financials[0]['Revenue Growth'])}</TableCell>
+          <TableCell align='right'>{formatPercent(props.financials[1]['Revenue Growth'])}</TableCell>
+          <TableCell align='right'>{formatPercent(props.financials[2]['Revenue Growth'])}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align='right'>Gross Profit</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[0]['Gross Profit'])}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[1]['Gross Profit'])}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[2]['Gross Profit'])}</TableCell>
+          <TableCell align='right'>Gross Margin</TableCell>
+          <TableCell align='right'>{formatPercent(props.financials[0]['Gross Margin'])}</TableCell>
+          <TableCell align='right'>{formatPercent(props.financials[1]['Gross Margin'])}</TableCell>
+          <TableCell align='right'>{formatPercent(props.financials[2]['Gross Margin'])}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align='right'>Operating Expenses</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[0]['Operating Expenses'])}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[1]['Operating Expenses'])}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[2]['Operating Expenses'])}</TableCell>
+          <TableCell align='right'>Net Profit Margin</TableCell>
+          <TableCell align='right'>{formatPercent(props.financials[0]['Net Profit Margin'])}</TableCell>
+          <TableCell align='right'>{formatPercent(props.financials[1]['Net Profit Margin'])}</TableCell>
+          <TableCell align='right'>{formatPercent(props.financials[2]['Net Profit Margin'])}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align='right'>Operating Income</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[0]['Operating Income'])}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[1]['Operating Income'])}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[2]['Operating Income'])}</TableCell>
+          <TableCell align='right'>Earnings per Share</TableCell>
+          <TableCell align='right'>{formatMoney(props.financials[0]['EPS'])}</TableCell>
+          <TableCell align='right'>{formatMoney(props.financials[1]['EPS'])}</TableCell>
+          <TableCell align='right'>{formatMoney(props.financials[2]['EPS'])}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell align='right'>R&D Expenses</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[0]['R&D Expenses'])}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[1]['R&D Expenses'])}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[2]['R&D Expenses'])}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align='right'>SG&A Expenses</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[0]['SG&A Expense'])}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[1]['SG&A Expense'])}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[2]['SG&A Expense'])}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell align='right'>Net Income</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[0]['Net Income'])}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[1]['Net Income'])}</TableCell>
-          <TableCell align='right'>{formatValue(props.financials[2]['Net Income'])}</TableCell>
+          <TableCell align='right'>Dividend per Share</TableCell>
+          <TableCell align='right'>{formatMoney(props.financials[0]['Dividend per Share'])}</TableCell>
+          <TableCell align='right'>{formatMoney(props.financials[1]['Dividend per Share'])}</TableCell>
+          <TableCell align='right'>{formatMoney(props.financials[2]['Dividend per Share'])}</TableCell>
         </TableRow>
       </TableBody>
     </Table>

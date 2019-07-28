@@ -1,5 +1,9 @@
 import { BehaviorSubject } from "rxjs";
 import * as snackBarStore from './snackbar-store';
+import * as notificationsStore from './notifications-store';
+import * as activitiesStore from './activities-store';
+import * as numeral from 'numeral';
+import * as moment from 'moment';
 
 /*
   STATE OBJECT
@@ -53,10 +57,25 @@ const effects = {
       });
     }
 
+    // decrement wallet amount for purchasing stock
     wallet = wallet - stock.price;
 
     // send off snackbar action
     snackBarStore.actions.show(`Purchased 1 share of ${stock.symbol} stock for your portfolio`);
+
+    // send off notifications action
+    notificationsStore.actions.add({
+      id: new Date(),
+      message: `Your portfolio is now at $${numeral(stocks.map(x => x.price * x.shares).reduce((a, b) => a + b)).format('0,0.00')}`,
+      createdAt: moment().fromNow(),
+    });
+
+    // send off notifications action
+    activitiesStore.actions.add({
+      id: new Date(),
+      message: `Purchased 1 share of ${stock.symbol} stock for your portfolio`,
+      createdAt: moment().format('HH:MM:SS'),
+    });
 
     // return new portfolio state object
     actions.buyStockSuccess({ wallet, stocks });
@@ -83,6 +102,20 @@ const effects = {
     // send off snackbar action
     snackBarStore.actions.show(`Sold 1 share of ${stock.symbol} stock from your portfolio`);
 
+    // send off notifications action
+    notificationsStore.actions.add({
+      id: new Date(),
+      message: `Your portfolio is now at $${numeral(stocks.map(x => x.price * x.shares).reduce((a, b) => a + b)).format('0,0.00')}`,
+      createdAt: moment().fromNow(),
+    });
+
+    // send off activities action
+    activitiesStore.actions.add({
+      id: new Date(),
+      message: `Sold 1 share of ${stock.symbol} stock from your portfolio`,
+      createdAt: moment().format('H:MM:SS'),
+    });
+
     // give the behavior subject a new state
     actions.sellStockSuccess({ wallet, stocks });
   },
@@ -92,9 +125,9 @@ const effects = {
   ACTIONS
 */
 export const actions = {
-  buyStock: (payload) => {
+  buyStock: (stock) => {
     // effect
-    effects.buyStock(payload, portfolioSubject.value);
+    effects.buyStock(stock, portfolioSubject.value);
 
   },
   buyStockSuccess: (payload) => {
