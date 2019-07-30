@@ -36,7 +36,8 @@ function App() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
   useEffect(() => {
-    stocksStore.actions.refresh();
+    stocksStore.dispatch({ type: 'REFRESH_AVAILABLE_STOCKS' });
+    
     const subscription = snackbarStore.snackbar$.subscribe(snackbar => {
       setIsSnackbarOpen(snackbar.isOpen);
       setSnackbarMessage(snackbar.message);
@@ -62,9 +63,9 @@ function App() {
           </Drawer>
           <div className={classes.content}>
             <Switch>
-              <Route path='/stocks' component={StocksProvider} />
-              <Route path='/portfolio' component={PortfolioProvider} />
-              <Route path='/activity' component={ActivityProvider} />
+              <Route exact path='/stocks' component={StocksProvider} />
+              <Route exact path='/portfolio' component={PortfolioProvider} />
+              <Route exact path='/activity' component={ActivityProvider} />
               <Redirect from='*' to='/stocks' />
             </Switch>
           </div>

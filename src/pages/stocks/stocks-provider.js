@@ -7,6 +7,7 @@ import StockCharts from './stock-charts';
 import { makeStyles } from '@material-ui/styles';
 import { Tabs, Tab, Typography } from '@material-ui/core';
 import SelectedStock from './selected-stock';
+import StocksError from './stocks-error';
 
 const useStyles = makeStyles({
   stocksProvider: {
@@ -30,6 +31,7 @@ const StocksProvider = () => {
   const [availableStocksState, setAvilableStocksState] = useState({
     loading: true,
     stocks: [],
+    error: false,
   });
   const [topFiveStockPicks, setTopFiveStockPicks] = useState([]);
   const [myStocks, setMyStocks] = useState([]);
@@ -42,48 +44,21 @@ const StocksProvider = () => {
   // this effect is for creating subscriptions to the store
   useEffect(() => {
     const subscriptions = [];
-
     // subscribe to stocks with shares owned in order to fill up the stock list
-    subscriptions.push(availableStocksStore.availableStocksStateWithSharesOwned$.subscribe(stockStoreState => {
-      setAvilableStocksState({
-        loading: stockStoreState.loading,
-        stocks: stockStoreState.stocks,
-      });
-    }));
+    subscriptions.push(availableStocksStore.availableStocksStateWithSharesOwned$.subscribe(state => { console.log(state); setAvilableStocksState(state)}));
 
     // subscribe to best performing stocks observable to push down to horizontal bar graph
-    subscriptions.push(availableStocksStore.bestPerformingStocks$.subscribe(stocks => {
-      setTopFiveStockPicks(stocks);
-    }));
+    subscriptions.push(availableStocksStore.bestPerformingStocks$.subscribe(stocks => setTopFiveStockPicks(stocks)));
 
     // subscribe to portfolio to push down to doughnut chart
-    subscriptions.push(portfolioStore.portfolio$.subscribe(portfolioState => {
-      setMyStocks(portfolioState.stocks);
-    }));
+    subscriptions.push(portfolioStore.portfolio$.subscribe(portfolioState => setMyStocks(portfolioState.stocks)));
 
     // subscribe to selected stocks to handle tabs of selected stocks
-    subscriptions.push(selectedStocksStore.selectedStocks$.subscribe(state => {
-      setSelectedStocksState({
-        stocks: state.stocks,
-        loading: state.loading,
-      });
-    }));
+    subscriptions.push(selectedStocksStore.selectedStocks$.subscribe(state => setSelectedStocksState(state)));
 
     // unsubscribe all subscriptions when component unmounts
     return () => subscriptions.forEach(subscription => subscription.unsubscribe());
   }, []);
-
-  const buyStock = (stock) => {
-    portfolioStore.actions.buyStock(stock);
-  }
-
-  const sellStock = (stock) => {
-    portfolioStore.actions.sellStock(stock);
-  }
-
-  const selectStock = (stock) => {
-    selectedStocksStore.actions.select(stock);
-  }
 
   const removeSelectedStock = (stock) => {
     selectedStocksStore.actions.remove(stock);
@@ -106,6 +81,24 @@ const StocksProvider = () => {
     )
   }
 
+  // react to error object inside of available stock state
+  // if there is an error, render the StocksError component instead of the StockList
+  const loadStockList = () => {
+    if (!availableStocksState.error) {
+      return (
+        <StockList
+          loading={availableStocksState.loading}
+          selectedStockLoading={selectedStocksState.loading}
+          stocks={availableStocksState.stocks}
+        />
+      )
+    } else {
+      return (
+        <StocksError />
+      );
+    }
+  }
+
   return (
     <div className={classes.stocksProvider}>
       <Tabs value={tab} onChange={handleTabChange} classes={{ root: classes.tabStyles }}>
@@ -122,14 +115,7 @@ const StocksProvider = () => {
           myStocksData={{ data: myStocks.map(x => x.price * x.shares), labels: myStocks.map(x => x.symbol) }}
         />
         <h4>Stocks</h4>
-        <StockList
-          loading={availableStocksState.loading}
-          selectedStockLoading={selectedStocksState.loading}
-          stocks={availableStocksState.stocks}
-          handleBuyStock={buyStock}
-          handleSellStock={sellStock}
-          handleSelectStock={selectStock}
-        />
+        { loadStockList() }
       </TabPanel>
       {
         selectedStocksState.stocks.map((value, index) => (

@@ -1,25 +1,40 @@
 import { BehaviorSubject } from "rxjs";
+import { scan, shareReplay } from "rxjs/operators";
 
 const initialState = [];
 
-const notificationsSubject = new BehaviorSubject(initialState);
+const actions$ = new BehaviorSubject(initialState);
 
-export const actions = {
-  add: (notification) => {
-    notificationsSubject.next([...notificationsSubject.value, notification]);
-  },
-  remove: (id) => {
-    let notifications = [...notificationsSubject.value];
-    notifications = notifications.filter(x => x.id !== id);
-    notificationsSubject.next(notifications);
-  },
-  clear: () => {
-    notificationsSubject.next(initialState);
-  },
+export const dispatch = (action) => {
+  actions$.next(action);
+}
+
+const reduce = (state, action) => {
+  let next;
+  switch (action.type) {
+    case 'ADD_NOTIFICATION':
+      next = [...state, action.payload];
+      break;
+    case 'REMOVE_NOTIFICATION':
+      next = state.filter(x => x.id !== action.payload);
+      break;
+    case 'CLEAR_NOTIFICATIONS':
+      next = [];
+      break;
+    default:
+      next = state;
+  }
+
+  window.devTools.send(action.type, next);
+
+  return next;
 }
 
 /*
   GETTERS
 */
-
-export const notifications$ = notificationsSubject.asObservable();
+export const notifications$ = actions$
+  .pipe(
+    scan((state, action) => reduce(state, action)),
+    shareReplay(1),
+  );

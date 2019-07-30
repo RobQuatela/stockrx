@@ -37,10 +37,7 @@ const TitleBar = (props) => {
 
   useEffect(() => {
     // subscribe to notifications store to receive list of notifications
-    const subscription = notificationsStore.notifications$.subscribe((notifications, err) => {
-      if (err) {
-        console.log(err);
-      }
+    const subscription = notificationsStore.notifications$.subscribe((notifications) => {
       setNotifications(notifications);
     })
 
@@ -55,16 +52,16 @@ const TitleBar = (props) => {
   }, [notifications]);
 
   const handleRefresh = async () => {
-    await stocksStore.actions.refresh();
+    stocksStore.dispatch({ type: 'REFRESH_AVAILABLE_STOCKS' });
   }
 
   const handleMenuClick = (event) => setAnchorEl(event.currentTarget);
 
   const handleMenuClose = () => setAnchorEl(null);
 
-  const removeNotification = (id) => notificationsStore.actions.remove(id);
+  const removeNotification = (id) => notificationsStore.dispatch({ type: 'REMOVE_NOTIFICATION', payload: id });
 
-  const clearAllNotifications = () => notificationsStore.actions.clear();
+  const clearAllNotifications = () => notificationsStore.dispatch({ type: 'CLEAR_NOTIFICATIONS' });
 
   return (
     <AppBar position='static' classes={{ root: classes.root, colorPrimary: classes.titleBarColorPrimary }} className={props.appbarstyle}>

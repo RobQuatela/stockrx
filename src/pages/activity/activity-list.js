@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/styles';
 import ActivityListItem from './activity-list-item';
 
@@ -11,8 +11,6 @@ const useStyles = makeStyles({
 
 const ActivityList = (props) => {
   const classes = useStyles();
-
-  useEffect(() => console.log(props));
 
   return (
     <div className={classes.root}>

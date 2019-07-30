@@ -29,20 +29,26 @@ const effects = {
     };
 
     // send off activities action
-    activitiesStore.actions.add({
-      id: new Date(),
-      message: `Selected ${stock.symbol} to view`,
-      createdAt: moment().format('H:MM:SS'),
+    activitiesStore.dispatch({
+      type: 'LOG_ACTIVITY',
+      payload: {
+        id: new Date(),
+        message: `Refreshed available stocks`,
+        createdAt: moment().format('H:MM:SS'),
+      }
     });
 
     actions.selectSuccess(selectedStock);
   },
   removeStock: (stock) => {
     // send off activities action
-    activitiesStore.actions.add({
-      id: new Date(),
-      message: `Closed ${stock.stockInfo.symbol} detail view`,
-      createdAt: moment().format('H:MM:SS'),
+    activitiesStore.dispatch({
+      type: 'LOG_ACTIVITY',
+      payload: {
+        id: new Date(),
+        message: `Refreshed available stocks`,
+        createdAt: moment().format('H:MM:SS'),
+      }
     });
   },
 };
