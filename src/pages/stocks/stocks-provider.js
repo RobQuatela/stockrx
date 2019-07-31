@@ -45,7 +45,7 @@ const StocksProvider = () => {
   useEffect(() => {
     const subscriptions = [];
     // subscribe to stocks with shares owned in order to fill up the stock list
-    subscriptions.push(availableStocksStore.availableStocksStateWithSharesOwned$.subscribe(state => { console.log(state); setAvilableStocksState(state)}));
+    subscriptions.push(availableStocksStore.availableStocksStateWithSharesOwned$.subscribe(state => setAvilableStocksState(state)));
 
     // subscribe to best performing stocks observable to push down to horizontal bar graph
     subscriptions.push(availableStocksStore.bestPerformingStocks$.subscribe(stocks => setTopFiveStockPicks(stocks)));
@@ -56,6 +56,7 @@ const StocksProvider = () => {
     // subscribe to selected stocks to handle tabs of selected stocks
     subscriptions.push(selectedStocksStore.selectedStocks$.subscribe(state => setSelectedStocksState(state)));
 
+    selectedStocksStore.selectedStocks1$.subscribe(x => console.log(x));
     // unsubscribe all subscriptions when component unmounts
     return () => subscriptions.forEach(subscription => subscription.unsubscribe());
   }, []);

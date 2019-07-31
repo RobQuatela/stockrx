@@ -106,7 +106,10 @@ const buyStockEffect$ = actions$
         wallet = wallet - action.payload.price;
 
         // send off snackbar action
-        snackBarStore.actions.show(`Purchased 1 share of ${action.payload.name} stock for your portfolio`);
+        snackBarStore.dispatch({
+          type: 'SHOW_SNACKBAR',
+          payload: `Purchased 1 share of ${action.payload.name} stock for your portfolio`
+        });
 
         // send off notifications action
         notificationsStore.dispatch({
@@ -158,7 +161,10 @@ const sellStockEffect$ = actions$
         wallet = wallet + action.payload.price;
 
         // send off snackbar action
-        snackBarStore.actions.show(`Sold 1 share of ${action.payload.symbol} stock from your portfolio`);
+        snackBarStore.dispatch({
+          type: 'SHOW_SNACKBAR',
+          payload: `Sold 1 share of ${action.payload.symbol} stock from your portfolio`
+        });
 
         // send off notifications action
         notificationsStore.dispatch({

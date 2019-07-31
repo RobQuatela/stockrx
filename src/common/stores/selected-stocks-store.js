@@ -1,6 +1,7 @@
 import { BehaviorSubject } from "rxjs";
 import * as activitiesStore from './activities-store';
 import * as moment from 'moment';
+import { tap, withLatestFrom, scan } from "rxjs/operators";
 
 const initialState = {
   stocks: [],
@@ -8,6 +9,7 @@ const initialState = {
 };
 
 const selectedStocksSubject = new BehaviorSubject(initialState);
+const actions$ = new BehaviorSubject(initialState);
 
 const effects = {
   findProfile: async (stock) => {
@@ -53,6 +55,10 @@ const effects = {
   },
 };
 
+export const dispatch = (action) => {
+  actions$.next(action);
+}
+
 export const actions = {
   select: async (stock) => {
     // if stock is not already in the list
@@ -86,4 +92,117 @@ export const actions = {
   },
 };
 
-export const selectedStocks$ = selectedStocksSubject.asObservable();
+const reducer = (state, action) => {
+  let next;
+  console.log(action.type);
+  switch (action.type) {
+    case 'SELECT_STOCK':
+      next = {
+        ...state,
+        loading: true,
+      };
+      break;
+    case 'SELECT_STOCK_SUCCESS':
+      next = {
+        ...state,
+        loading: false,
+        stocks: [...state.stocks, action.payload],
+      };
+      break;
+    case 'SELECT_STOCK_FAIL':
+      next = {
+        ...state,
+        loading: false,
+      };
+      break;
+    case 'REMOVE_STOCK':
+      next = {
+        ...state,
+        stocks: state.stocks.filter(x => x.stockInfo.symbol !== action.payload.stockInfo.symbol),
+      };
+      break;
+    default:
+      next = {
+        ...state,
+      };
+  }
+
+  window.devTools.send(action.type, next);
+
+  return next;
+}
+
+export const selectedStocks1$ = selectedStocksSubject.asObservable();
+export const selectedStocks$ = actions$
+  .asObservable()
+  .pipe(
+    scan((acc, curr) => reducer(acc, curr)),
+  );
+
+const findSelectedStockEffect$ = actions$
+  .pipe(
+    tap(action => {
+      if (action.type === 'SELECT_STOCK') {
+        const stock = action.payload
+        activitiesStore.dispatch({
+          type: 'LOG_ACTIVITY',
+          id: new Date(),
+          message: `Selected ${stock.name} stock to view`,
+          createdAt: moment().format('H:MM:SS'),
+        })
+      }
+    }),
+    withLatestFrom(selectedStocks$),
+    tap(async ([action, state]) => {
+      if (action.type === 'SELECT_STOCK') {
+        if (!stockIsDuplicate(action.payload, state.stocks)) {
+          try {
+            const stock = action.payload;
+            const stockProfileResult = await fetch(`https://financialmodelingprep.com/api/v3/company/profile/${stock.symbol}`).then(res => res.json());
+            const stockIncomeStatementResult = await fetch(`https://financialmodelingprep.com/api/v3/financials/income-statement/${stock.symbol}`).then(res => res.json());
+
+            const selectedStock = {
+              stockInfo: stock,
+              profile: stockProfileResult.profile,
+              financials: stockIncomeStatementResult.financials,
+            };
+
+            dispatch({
+              type: 'SELECT_STOCK_SUCCESS',
+              payload: selectedStock,
+            });
+          } catch (err) {
+            dispatch({
+              type: 'SELECT_STOCK_FAIL',
+              payload: err,
+            });
+          }
+        } else {
+          dispatch({
+            type: 'SELECT_STOCK_FAIL',
+          });
+        }
+      }
+    }),
+  );
+
+const removeSelectedStockEffect$ = actions$
+  .pipe(
+    tap(action => {
+      if (action.type === 'SELECT_STOCK') {
+        activitiesStore.dispatch({
+          type: 'LOG_ACTIVITY',
+          id: new Date(),
+          message: `Removed ${action.payload.name} stock from view`,
+          createdAt: moment().format('H:MM:SS'),
+        })
+      }
+    }),
+  );
+
+findSelectedStockEffect$.subscribe();
+removeSelectedStockEffect$.subscribe();
+
+const stockIsDuplicate = (selectedStock, stocks) => {
+  return stocks.findIndex(x => x.stockInfo.symbol === selectedStock.symbol) > - 1;
+}

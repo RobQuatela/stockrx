@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import TitleBar from './common/components/title-bar';
-import * as stocksStore from './common/stores/available-stocks-store';
+import * as availableStocksStore from './common/stores/available-stocks-store';
 import * as snackbarStore from './common/stores/snackbar-store';
+import * as activityStore from './common/stores/activities-store';
 import StocksProvider from './pages/stocks/stocks-provider';
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom';
 import PortfolioProvider from './pages/portfolio/portfolio-provider';
@@ -36,17 +37,22 @@ function App() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
   useEffect(() => {
-    stocksStore.dispatch({ type: 'REFRESH_AVAILABLE_STOCKS' });
+    availableStocksStore.dispatch({ type: 'REFRESH_AVAILABLE_STOCKS' });
     
-    const subscription = snackbarStore.snackbar$.subscribe(snackbar => {
+    const subscriptions = [];
+    
+    subscriptions.push(snackbarStore.snackbar$.subscribe(snackbar => {
       setIsSnackbarOpen(snackbar.isOpen);
       setSnackbarMessage(snackbar.message);
-    });
+    }));
 
-    return () => subscription.unsubscribe();
+    subscriptions.push(availableStocksStore.availableStocksState$.subscribe());
+    subscriptions.push(activityStore.activities$.subscribe());
+
+    return () => subscriptions.forEach(subscription => subscription.unsubscribe());
   }, []);
 
-  const handleCloseSnackbar = () => snackbarStore.actions.hide();
+  const handleCloseSnackbar = () => snackbarStore.dispatch({ type: 'HIDE_SNACKBAR' });
 
   return (
     <div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Icon, IconButton, Button, CircularProgress } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import * as numeral from 'numeral';
@@ -37,7 +37,6 @@ const useStyles = makeStyles({
 
 const StockListItem = (props) => {
   const classes = useStyles();
-  const [loading, setLoading] = useState(props.loading);
 
   // if the shares owned of a stock is greater than 0, show this component
   const showSellStockButton = () => {
@@ -65,8 +64,10 @@ const StockListItem = (props) => {
   }
 
   const handleSelectStock = (stock) => {
-    setLoading(true);
-    selectedStocksStore.actions.select(stock);
+    selectedStocksStore.dispatch({
+      type: 'SELECT_STOCK',
+      payload: stock,
+    });
   }
 
   return (
@@ -88,7 +89,7 @@ const StockListItem = (props) => {
         {showSellStockButton()}
       </div>
       {
-        !loading ? <h3>{props.stock.sharesOwned}</h3> : <CircularProgress />
+        !props.loading ? <h3>{props.stock.sharesOwned}</h3> : <CircularProgress />
       }
     </div>
   )
