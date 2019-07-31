@@ -18,7 +18,7 @@ const SelectedStock = (props) => {
 
   return (
     <Paper className={classes.root}>
-      <IconButton color='secondary' onClick={() => props.onremovestock(props.stock)}>
+      <IconButton color='secondary' onClick={() => props.handleremovestock(props.stock)}>
         <Icon>close</Icon>
       </IconButton>
       <div className={classes.companyDetail}>

@@ -71,7 +71,7 @@ GETTERS
 */
 export const portfolio$ = actions$
   .pipe(
-    scan((state, action) => reduce(state, action)),
+    scan((acc, curr) => reduce(acc, curr)),
     shareReplay(1),
   );
 
@@ -151,9 +151,10 @@ const sellStockEffect$ = actions$
         // if the shares owned of that stock is 0, then remove that stock from the portfolio
         const matchIndex = stocks.findIndex(x => x.symbol === action.payload.symbol);
         if (matchIndex > -1) {
-          if (stocks[matchIndex].shares !== 0) {
+          if (stocks[matchIndex].shares > 1) {
             stocks[matchIndex].shares--;
           } else {
+            stocks[matchIndex].shares--;
             stocks = stocks.filter(x => x.symbol !== action.payload.symbol);
           }
         }

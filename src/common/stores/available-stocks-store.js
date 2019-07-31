@@ -60,8 +60,6 @@ const reduce = (state, action) => {
 */
 export const availableStocksState$ = actions$
   .pipe(
-    // start with an initial state
-    //startWith(initialstate),
     // accumulated state is the last action the action subject has
     // the current state is the newest action that was added to the subject
     scan((acc, curr) => reduce(acc, curr)),
@@ -139,14 +137,14 @@ const findall$ = actions$
           });
         } catch (err) {
           // send action to create new state for failed refresh
-          dispatch({ type: 'REFRESH_AVAILABLE_STOCKS_FAIL', payload: {} });
+          dispatch({ type: 'REFRESH_AVAILABLE_STOCKS_FAIL' });
 
           // send off activity logging
           activitiesStore.dispatch({
             type: 'LOG_ACTIVITY',
             payload: {
               id: new Date(),
-              message: `Refreshed available stocks`,
+              message: `Failed to refresh available stocks`,
               createdAt: moment().format('H:MM:SS'),
             }
           });

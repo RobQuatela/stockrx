@@ -28,14 +28,19 @@ const useStyles = makeStyles({
 
 const StocksProvider = () => {
   const classes = useStyles();
+  // state from the available stock store
   const [availableStocksState, setAvilableStocksState] = useState({
     loading: true,
     stocks: [],
     error: false,
   });
+  // sliced state from available stock store
   const [topFiveStockPicks, setTopFiveStockPicks] = useState([]);
+  // state from portfolio store
   const [myStocks, setMyStocks] = useState([]);
+  // state for number of tabs open on page (localized, no store)
   const [tab, setTab] = useState(0);
+  // state from selected stock store
   const [selectedStocksState, setSelectedStocksState] = useState({
     stocks: [],
     loading: false,
@@ -56,13 +61,15 @@ const StocksProvider = () => {
     // subscribe to selected stocks to handle tabs of selected stocks
     subscriptions.push(selectedStocksStore.selectedStocks$.subscribe(state => setSelectedStocksState(state)));
 
-    selectedStocksStore.selectedStocks1$.subscribe(x => console.log(x));
     // unsubscribe all subscriptions when component unmounts
     return () => subscriptions.forEach(subscription => subscription.unsubscribe());
   }, []);
 
   const removeSelectedStock = (stock) => {
-    selectedStocksStore.actions.remove(stock);
+    selectedStocksStore.dispatch({
+      type: 'REMOVE_SELECTED_STOCK',
+      payload: stock,
+    });
     setTab(0);
   }
 
@@ -121,7 +128,7 @@ const StocksProvider = () => {
       {
         selectedStocksState.stocks.map((value, index) => (
           <TabPanel value={tab} index={index + 1} key={value.stockInfo.symbol}>
-            <SelectedStock stock={value} onremovestock={removeSelectedStock} />
+            <SelectedStock stock={value} handleremovestock={removeSelectedStock} />
           </TabPanel>
         ))
       }

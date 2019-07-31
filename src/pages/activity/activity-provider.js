@@ -14,6 +14,7 @@ const ActivityProvider = () => {
   const [activities, setActivities] = useState([]);
 
   useEffect(() => {
+    // create subscription to set state of to activities store
     const subscription = activitiesService.activities$.subscribe(a => {
       setActivities(a);
     });
